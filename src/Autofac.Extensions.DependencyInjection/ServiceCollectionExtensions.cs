@@ -38,10 +38,11 @@ namespace Autofac.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The service collection to add the factory to.</param>
         /// <param name="configurationAction">Action on a <see cref="ContainerBuilder"/> that adds component registrations to the container.</param>
+        /// <param name="configureLifetimeScope">Lambda to set the <see cref="ILifetimeScope"/> on the <see cref="AutofacServiceProvider"/>. Default is the built container.</param>
         /// <returns>The service collection.</returns>
-        public static IServiceCollection AddAutofac(this IServiceCollection services, Action<ContainerBuilder> configurationAction = null)
+        public static IServiceCollection AddAutofac(this IServiceCollection services, Action<ContainerBuilder> configurationAction = null, Func<IContainer, ILifetimeScope> configureLifetimeScope = null)
         {
-            return services.AddSingleton<IServiceProviderFactory<ContainerBuilder>>(new AutofacServiceProviderFactory(configurationAction));
+            return services.AddSingleton<IServiceProviderFactory<ContainerBuilder>>(new AutofacServiceProviderFactory(configurationAction, configureLifetimeScope));
         }
     }
 }

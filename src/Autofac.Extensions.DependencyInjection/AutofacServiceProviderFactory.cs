@@ -34,14 +34,17 @@ namespace Autofac.Extensions.DependencyInjection
     public class AutofacServiceProviderFactory : IServiceProviderFactory<ContainerBuilder>
     {
         private readonly Action<ContainerBuilder> _configurationAction;
+        private readonly Func<IContainer, ILifetimeScope> _configureLifetimeScope;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AutofacServiceProviderFactory"/> class.
         /// </summary>
         /// <param name="configurationAction">Action on a <see cref="ContainerBuilder"/> that adds component registrations to the conatiner.</param>
-        public AutofacServiceProviderFactory(Action<ContainerBuilder> configurationAction = null)
+        /// <param name="configureLifetimeScope">Lambda to set the <see cref="ILifetimeScope"/> on the <see cref="AutofacServiceProvider"/>. Default is the built container.</param>
+        public AutofacServiceProviderFactory(Action<ContainerBuilder> configurationAction = null, Func<IContainer, ILifetimeScope> configureLifetimeScope = null)
         {
             _configurationAction = configurationAction ?? (builder => { });
+            _configureLifetimeScope = configureLifetimeScope ?? (container => container);
         }
 
         /// <summary>
@@ -71,7 +74,9 @@ namespace Autofac.Extensions.DependencyInjection
 
             var container = containerBuilder.Build();
 
-            return new AutofacServiceProvider(container);
+            var lifetimeScope = _configureLifetimeScope(container);
+
+            return new AutofacServiceProvider(lifetimeScope);
         }
     }
 }
